@@ -485,41 +485,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 308px;
+  height: 216px;
   overflow: hidden;
   gap: 0;
   padding: 0 24px;
-}
-
-.wheel-body::before,
-.wheel-body::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 132px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.wheel-body::before {
-  top: 0;
-  background: linear-gradient(
-    to bottom,
-    var(--color-card) 0%,
-    rgba(255, 255, 255, 0.7) 40%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-
-.wheel-body::after {
-  bottom: 0;
-  background: linear-gradient(
-    to top,
-    var(--color-card) 0%,
-    rgba(255, 255, 255, 0.7) 40%,
-    rgba(255, 255, 255, 0) 100%
-  );
 }
 
 .wheel-column {
@@ -528,6 +497,7 @@
   flex: 0 0 110px;
   position: relative;
   cursor: grab;
+  perspective: 1000px;
 }
 
 .wheel-column:active {
@@ -535,19 +505,26 @@
 }
 
 .wheel-list {
-  position: relative;
-  top: 132px; /* (308 - 44) / 2 = center offset */
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin-top: -22px; /* half of ITEM_HEIGHT */
+  transform-style: preserve-3d;
   will-change: transform;
 }
 
 .wheel-item {
+  position: absolute;
+  width: 100%;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 22px;
   color: var(--color-text);
-  transition: font-weight 0.08s;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -582,7 +559,7 @@
   border-bottom: 0.5px solid var(--color-separator);
   border-radius: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 3;
 }
 
 /* ── Tappable input rows (for picker trigger) ── */

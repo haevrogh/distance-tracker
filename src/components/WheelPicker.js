@@ -236,6 +236,13 @@ const PICKER_CONFIGS = {
     decStep: 5, // 0.5 increments (0, 5)
     defaultValue: 10,
   },
+  distance: {
+    title: 'Дистанция',
+    unit: 'км',
+    intRange: [0, 99],
+    decStep: 1, // 0.1 increments
+    defaultValue: 5,
+  },
 };
 
 /**

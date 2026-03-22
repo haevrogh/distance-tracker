@@ -17,6 +17,7 @@ import {
 import { getEntriesByDateRange } from '../db.js';
 import { getDailyRecommendation } from '../utils/calculations.js';
 import { getWeekStart, getWeekEnd } from '../utils/date.js';
+import { showPicker } from '../components/WheelPicker.js';
 
 export function render(params) {
   const isEdit = params && params.id;
@@ -24,19 +25,11 @@ export function render(params) {
     <div class="screen add-entry-screen" id="add-entry">
       <div class="screen-title">${isEdit ? 'Редактировать' : 'Новая запись'}</div>
 
-      <div class="add-entry-hero">
-        <input
-          type="number"
-          class="big-input"
-          id="distance-input"
-          placeholder="0.0"
-          inputmode="decimal"
-          step="0.1"
-          min="0"
-          autocomplete="off"
-        >
-        <div class="big-input-unit">километров</div>
+      <div class="add-entry-hero" id="distance-picker-trigger" style="cursor:pointer;">
+        <div class="big-input" id="distance-display" data-value="0">0.0</div>
+        <div class="big-input-unit">километров · нажмите чтобы указать</div>
       </div>
+      <input type="hidden" id="distance-input" value="0">
 
       <div class="input-group">
         <div class="input-row">
@@ -66,23 +59,46 @@ export function render(params) {
 export function mount(container, params) {
   const isEdit = params && params.id;
   const distInput = container.querySelector('#distance-input');
+  const distDisplay = container.querySelector('#distance-display');
+  const distTrigger = container.querySelector('#distance-picker-trigger');
   const dateInput = container.querySelector('#date-input');
   const noteInput = container.querySelector('#note-input');
   const saveBtn = container.querySelector('#save-entry-btn');
   const deleteBtn = container.querySelector('#delete-entry-btn');
+
+  function setDistance(val) {
+    distInput.value = val;
+    distDisplay.dataset.value = val;
+    distDisplay.textContent = val > 0 ? val.toFixed(1) : '0.0';
+    // Update hint text
+    const unitEl = container.querySelector('.big-input-unit');
+    if (unitEl) {
+      unitEl.textContent = val > 0 ? 'километров' : 'километров · нажмите чтобы указать';
+    }
+  }
+
+  function openDistancePicker() {
+    const current = parseFloat(distInput.value) || 0;
+    showPicker('distance', current, (newVal) => {
+      setDistance(newVal);
+    });
+  }
 
   // Load existing entry for editing
   if (isEdit) {
     loadEntry(Number(params.id));
   }
 
-  // Focus distance input
-  setTimeout(() => distInput.focus(), 300);
+  // Open picker on tap (auto-open for new entries)
+  distTrigger.addEventListener('click', openDistancePicker);
+  if (!isEdit) {
+    setTimeout(() => openDistancePicker(), 400);
+  }
 
   async function loadEntry(id) {
     const entry = await getEntryById(id);
     if (entry) {
-      distInput.value = entry.distance;
+      setDistance(entry.distance);
       dateInput.value = entry.date;
       noteInput.value = entry.note || '';
     }
@@ -91,8 +107,9 @@ export function mount(container, params) {
   async function save() {
     const distance = parseFloat(distInput.value);
     if (!distance || distance <= 0) {
-      distInput.classList.add('shake');
-      setTimeout(() => distInput.classList.remove('shake'), 500);
+      distDisplay.classList.add('shake');
+      setTimeout(() => distDisplay.classList.remove('shake'), 500);
+      openDistancePicker();
       return;
     }
 
@@ -165,16 +182,10 @@ export function mount(container, params) {
   saveBtn.addEventListener('click', save);
   if (deleteBtn) deleteBtn.addEventListener('click', handleDelete);
 
-  // Save on Enter
-  function handleKeydown(e) {
-    if (e.key === 'Enter') save();
-  }
-  distInput.addEventListener('keydown', handleKeydown);
-
   return () => {
     saveBtn.removeEventListener('click', save);
     if (deleteBtn) deleteBtn.removeEventListener('click', handleDelete);
-    distInput.removeEventListener('keydown', handleKeydown);
+    distTrigger.removeEventListener('click', openDistancePicker);
   };
 }
 

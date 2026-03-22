@@ -64,6 +64,8 @@ function createColumn(items, selectedIndex, onChange) {
     for (let i = 0; i < allEls.length; i++) {
       const dist = Math.abs(i - centerPos);
       allEls[i].style.fontWeight = dist < 0.5 ? '600' : '400';
+      // Hide items far from center to prevent overlap artifacts
+      allEls[i].style.visibility = dist > 5 ? 'hidden' : 'visible';
     }
   }
 

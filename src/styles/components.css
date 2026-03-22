@@ -493,7 +493,6 @@
 
 .wheel-column {
   height: 100%;
-  overflow: hidden;
   flex: 0 0 110px;
   position: relative;
   cursor: grab;

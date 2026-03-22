@@ -2,6 +2,7 @@ import { getSetting, setSetting, addMeasurement, getAllMeasurements, getLatestMe
 import { today, formatDateHuman } from '../utils/date.js';
 import { emit } from '../store.js';
 import { exportAllData, importData } from '../utils/export.js';
+import { showPicker } from '../components/WheelPicker.js';
 
 export function render() {
   return `
@@ -25,11 +26,10 @@ export function mount(container) {
       <div class="section-header">Цель</div>
       <div class="settings-section">
         <div class="input-group">
-          <div class="input-row">
-            <label for="weekly-goal">Недельная цель</label>
-            <input type="number" id="weekly-goal" value="${weeklyGoal}"
-                   placeholder="0" inputmode="decimal" step="0.5" min="0">
-            <span style="color:var(--color-text-secondary);font-size:15px;">км</span>
+          <div class="input-row input-row-tappable" id="goal-row" data-picker="goal" data-value="${weeklyGoal || 0}">
+            <label>Недельная цель</label>
+            <span class="input-row-value" id="goal-display">${weeklyGoal ? `${parseFloat(weeklyGoal).toFixed(1)} км` : 'Указать'}</span>
+            <span class="input-row-chevron"></span>
           </div>
         </div>
       </div>
@@ -37,23 +37,20 @@ export function mount(container) {
       <div class="section-header">Замеры тела</div>
       <div class="settings-section">
         <div class="input-group">
-          <div class="input-row">
-            <label for="weight-input">Вес</label>
-            <input type="number" id="weight-input" value="${currentWeight}"
-                   placeholder="0" inputmode="decimal" step="0.1" min="0">
-            <span style="color:var(--color-text-secondary);font-size:15px;">кг</span>
+          <div class="input-row input-row-tappable" id="weight-row" data-picker="weight" data-value="${currentWeight || 0}">
+            <label>Вес</label>
+            <span class="input-row-value" id="weight-display">${currentWeight ? `${parseFloat(currentWeight).toFixed(1)} кг` : 'Указать'}</span>
+            <span class="input-row-chevron"></span>
           </div>
-          <div class="input-row">
-            <label for="waist-input">Талия</label>
-            <input type="number" id="waist-input" value="${latest?.waist || ''}"
-                   placeholder="0" inputmode="decimal" step="0.5" min="0">
-            <span style="color:var(--color-text-secondary);font-size:15px;">см</span>
+          <div class="input-row input-row-tappable" id="waist-row" data-picker="waist" data-value="${latest?.waist || 0}">
+            <label>Талия</label>
+            <span class="input-row-value" id="waist-display">${latest?.waist ? `${parseFloat(latest.waist).toFixed(1)} см` : 'Указать'}</span>
+            <span class="input-row-chevron"></span>
           </div>
-          <div class="input-row">
-            <label for="hips-input">Бёдра</label>
-            <input type="number" id="hips-input" value="${latest?.hips || ''}"
-                   placeholder="0" inputmode="decimal" step="0.5" min="0">
-            <span style="color:var(--color-text-secondary);font-size:15px;">см</span>
+          <div class="input-row input-row-tappable" id="hips-row" data-picker="hips" data-value="${latest?.hips || 0}">
+            <label>Бёдра</label>
+            <span class="input-row-value" id="hips-display">${latest?.hips ? `${parseFloat(latest.hips).toFixed(1)} см` : 'Указать'}</span>
+            <span class="input-row-chevron"></span>
           </div>
         </div>
         <div style="padding:12px 0;">
@@ -112,36 +109,37 @@ export function mount(container) {
   }
 
   function bindEvents(el) {
-    // Weekly goal - auto-save on change
-    const goalInput = el.querySelector('#weekly-goal');
-    let goalTimeout;
-    goalInput.addEventListener('input', () => {
-      clearTimeout(goalTimeout);
-      goalTimeout = setTimeout(async () => {
-        const val = parseFloat(goalInput.value) || 0;
-        await setSetting('weeklyGoal', val);
-        emit('settings-changed');
-        showToast(el, 'Цель сохранена');
-      }, 500);
-    });
+    // Picker values stored on rows via data-value
+    const units = { goal: 'км', weight: 'кг', waist: 'см', hips: 'см' };
 
-    // Weight - auto-save
-    const weightInput = el.querySelector('#weight-input');
-    let weightTimeout;
-    weightInput.addEventListener('input', () => {
-      clearTimeout(weightTimeout);
-      weightTimeout = setTimeout(async () => {
-        const val = parseFloat(weightInput.value) || 0;
-        await setSetting('currentWeight', val);
-        emit('settings-changed');
-      }, 500);
+    // Open picker on row tap
+    el.querySelectorAll('[data-picker]').forEach((row) => {
+      row.addEventListener('click', () => {
+        const type = row.dataset.picker;
+        const currentVal = parseFloat(row.dataset.value) || 0;
+
+        showPicker(type, currentVal, async (newVal) => {
+          row.dataset.value = newVal;
+          const displayEl = row.querySelector('.input-row-value');
+          displayEl.textContent = `${newVal.toFixed(1)} ${units[type]}`;
+
+          if (type === 'goal') {
+            await setSetting('weeklyGoal', newVal);
+            emit('settings-changed');
+            showToast(el, 'Цель сохранена');
+          } else if (type === 'weight') {
+            await setSetting('currentWeight', newVal);
+            emit('settings-changed');
+          }
+        });
+      });
     });
 
     // Save measurements button
     el.querySelector('#save-measurements-btn').addEventListener('click', async () => {
-      const weight = parseFloat(weightInput.value) || null;
-      const waist = parseFloat(el.querySelector('#waist-input').value) || null;
-      const hips = parseFloat(el.querySelector('#hips-input').value) || null;
+      const weight = parseFloat(el.querySelector('#weight-row').dataset.value) || null;
+      const waist = parseFloat(el.querySelector('#waist-row').dataset.value) || null;
+      const hips = parseFloat(el.querySelector('#hips-row').dataset.value) || null;
 
       if (!weight && !waist && !hips) {
         showToast(el, 'Введите хотя бы один замер');

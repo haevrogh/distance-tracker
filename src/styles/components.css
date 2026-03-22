@@ -416,6 +416,7 @@
   align-items: flex-end;
   justify-content: center;
   transition: background 0.3s;
+  touch-action: none;
 }
 
 .wheel-overlay.wheel-visible {
@@ -479,30 +480,52 @@
   color: var(--color-text);
 }
 
-.wheel-display {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-primary);
-  padding: 16px 0 8px;
-  letter-spacing: -0.5px;
-}
-
 .wheel-body {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 220px;
+  height: 308px;
   overflow: hidden;
   gap: 0;
   padding: 0 24px;
 }
 
+.wheel-body::before,
+.wheel-body::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 132px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.wheel-body::before {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--color-card) 0%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.wheel-body::after {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    var(--color-card) 0%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
 .wheel-column {
   height: 100%;
   overflow: hidden;
-  flex: 0 0 80px;
+  flex: 0 0 110px;
   position: relative;
   cursor: grab;
 }
@@ -513,7 +536,7 @@
 
 .wheel-list {
   position: relative;
-  top: 88px; /* (220 - 44) / 2 = center offset */
+  top: 132px; /* (308 - 44) / 2 = center offset */
   will-change: transform;
 }
 
@@ -524,7 +547,7 @@
   justify-content: center;
   font-size: 22px;
   color: var(--color-text);
-  transition: opacity 0.08s, transform 0.08s, font-weight 0.08s;
+  transition: font-weight 0.08s;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -554,10 +577,12 @@
   top: 50%;
   transform: translateY(-50%);
   height: 44px;
-  background: var(--color-fill);
-  border-radius: 10px;
+  background: transparent;
+  border-top: 0.5px solid var(--color-separator);
+  border-bottom: 0.5px solid var(--color-separator);
+  border-radius: 0;
   pointer-events: none;
-  z-index: -1;
+  z-index: 1;
 }
 
 /* ── Tappable input rows (for picker trigger) ── */

@@ -4,7 +4,7 @@
  */
 
 const ITEM_HEIGHT = 44;
-const VISIBLE_ITEMS = 5;
+const VISIBLE_ITEMS = 7;
 
 function haptic(style = 'light') {
   if (!navigator.vibrate) return;
@@ -60,27 +60,17 @@ function createColumn(items, selectedIndex, onChange) {
 
   function updateHighlight() {
     const allEls = list.children;
+    const centerPos = -offset / ITEM_HEIGHT;
     for (let i = 0; i < allEls.length; i++) {
       const isPad = i < padCount || i >= allEls.length - padCount;
-      const realIdx = i - padCount;
-      const centerPos = -offset / ITEM_HEIGHT;
-      const dist = Math.abs(realIdx - centerPos);
-
       if (isPad) {
         allEls[i].style.opacity = '0';
-        allEls[i].style.transform = 'scale(0.8)';
-      } else if (dist < 0.5) {
-        allEls[i].style.opacity = '1';
-        allEls[i].style.transform = 'scale(1.05)';
-        allEls[i].style.fontWeight = '600';
-      } else if (dist < 1.5) {
-        allEls[i].style.opacity = '0.5';
-        allEls[i].style.transform = 'scale(0.95)';
-        allEls[i].style.fontWeight = '400';
       } else {
-        allEls[i].style.opacity = '0.2';
-        allEls[i].style.transform = 'scale(0.85)';
-        allEls[i].style.fontWeight = '400';
+        allEls[i].style.opacity = '';
+        allEls[i].style.transform = '';
+        const realIdx = i - padCount;
+        const dist = Math.abs(realIdx - centerPos);
+        allEls[i].style.fontWeight = dist < 0.5 ? '600' : '400';
       }
     }
   }
@@ -316,22 +306,12 @@ export function showPicker(type, currentValue, onConfirm) {
   header.appendChild(title);
   header.appendChild(doneBtn);
 
-  // Value display
-  const display = document.createElement('div');
-  display.className = 'wheel-display';
-
-  function updateDisplay() {
-    const val = selectedInt + selectedDec / 10;
-    display.textContent = `${val.toFixed(1)} ${config.unit}`;
-  }
-
   // Picker body
   const body = document.createElement('div');
   body.className = 'wheel-body';
 
   const intCol = createColumn(intItems, selectedInt - config.intRange[0], (idx, item) => {
     selectedInt = item.value;
-    updateDisplay();
   });
 
   const sep = document.createElement('div');
@@ -340,7 +320,6 @@ export function showPicker(type, currentValue, onConfirm) {
 
   const decCol = createColumn(decItems, decIndex, (idx, item) => {
     selectedDec = item.value;
-    updateDisplay();
   });
 
   const unitEl = document.createElement('div');
@@ -358,13 +337,19 @@ export function showPicker(type, currentValue, onConfirm) {
   body.appendChild(highlight);
 
   sheet.appendChild(header);
-  sheet.appendChild(display);
   sheet.appendChild(body);
   overlay.appendChild(sheet);
 
-  updateDisplay();
-
   function close() {
+    // Unlock viewport
+    const savedScrollY = Math.abs(parseInt(document.body.style.top || '0', 10));
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, savedScrollY);
+
     overlay.classList.add('wheel-closing');
     sheet.classList.add('wheel-sheet-closing');
     setTimeout(() => overlay.remove(), 300);
@@ -390,5 +375,14 @@ export function showPicker(type, currentValue, onConfirm) {
   });
 
   document.body.appendChild(overlay);
+
+  // Lock viewport
+  const scrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.overflow = 'hidden';
+
   requestAnimationFrame(() => overlay.classList.add('wheel-visible'));
 }

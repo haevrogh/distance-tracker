@@ -1,0 +1,109 @@
+:root {
+  --color-primary: #007AFF;
+  --color-primary-light: #409CFF;
+  --color-success: #34C759;
+  --color-success-light: #A8E6CF;
+  --color-warning: #FF9500;
+  --color-danger: #FF3B30;
+  --color-gold: #FFD700;
+
+  --color-bg: #F2F2F7;
+  --color-card: #FFFFFF;
+  --color-text: #1C1C1E;
+  --color-text-secondary: #8E8E93;
+  --color-text-tertiary: #AEAEB2;
+  --color-separator: rgba(60, 60, 67, 0.12);
+  --color-fill: rgba(120, 120, 128, 0.08);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+    'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --tab-bar-height: 83px;
+  --header-height: 44px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  height: 100%;
+  font-family: var(--font-family);
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--color-text);
+  background: var(--color-bg);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: inherit;
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  -webkit-appearance: none;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="38.400000000000006" fill="#007AFF"/>
+  <circle cx="96" cy="96" r="76.80000000000001" fill="none" stroke="white" stroke-width="11.52" stroke-linecap="round" stroke-dasharray="361.9 120.6" transform="rotate(-90 96 96)"/>
+  <text x="96" y="107.52" text-anchor="middle" fill="white" font-family="-apple-system,sans-serif" font-weight="700" font-size="38.400000000000006">km</text>
+</svg>

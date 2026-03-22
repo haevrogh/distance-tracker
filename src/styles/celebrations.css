@@ -1,0 +1,155 @@
+/* ── Check Animation ── */
+.check-animation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.check-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.check-circle svg {
+  width: 40px;
+  height: 40px;
+  stroke: white;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.check-circle svg path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: checkDraw 0.4s 0.2s forwards;
+}
+
+@keyframes checkBounce {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes checkDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Daily Goal Badge ── */
+.daily-goal-badge {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  text-align: center;
+  animation: badgeAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.daily-goal-badge-inner {
+  background: var(--color-success);
+  color: white;
+  padding: 16px 32px;
+  border-radius: var(--radius-xl);
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(52, 199, 89, 0.4);
+}
+
+@keyframes badgeAppear {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* ── Weekly Celebration Overlay ── */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s;
+}
+
+.celebration-content {
+  text-align: center;
+  color: white;
+  animation: celebrationPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 24px;
+}
+
+.celebration-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.celebration-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.celebration-value {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -1px;
+}
+
+.celebration-subtitle {
+  font-size: 17px;
+  opacity: 0.8;
+}
+
+@keyframes celebrationPop {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Confetti Canvas ── */
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 3001;
+  pointer-events: none;
+}
+
+/* ── Progress Ring Pulse ── */
+.ring-pulse {
+  animation: ringPulse 0.8s ease-in-out 2;
+}
+
+@keyframes ringPulse {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 12px var(--color-success)); }
+}
+
+/* ── Gold Ring (overachievement) ── */
+.ring-gold .progress-ring-circle {
+  stroke: var(--color-gold) !important;
+}
+
+.ring-gold {
+  animation: ringGlow 1s ease-in-out 2;
+}
+
+@keyframes ringGlow {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 16px var(--color-gold)); }
+}

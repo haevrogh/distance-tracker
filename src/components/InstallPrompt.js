@@ -7,19 +7,8 @@ export function init() {
     showBanner('android');
   });
 
-  // Check if iOS Safari and not standalone
-  const isIOS =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isStandalone =
-    window.navigator.standalone ||
-    window.matchMedia('(display-mode: standalone)').matches;
+  // iOS Safari doesn't support beforeinstallprompt — hide install prompt on iOS
 
-  if (isIOS && !isStandalone) {
-    const dismissed = localStorage.getItem('install-dismissed');
-    if (!dismissed) {
-      setTimeout(() => showBanner('ios'), 2000);
-    }
-  }
 }
 
 function showBanner(platform) {
@@ -28,30 +17,17 @@ function showBanner(platform) {
   const el = document.createElement('div');
   el.className = 'install-banner';
 
-  if (platform === 'ios') {
-    el.innerHTML = `
-      <div class="install-banner-content">
-        <div class="install-banner-icon">📲</div>
-        <div class="install-banner-text">
-          <div class="install-banner-title">Установите приложение</div>
-          <div class="install-banner-desc">Нажмите <strong>Поделиться</strong> → <strong>На экран «Домой»</strong></div>
-        </div>
-        <button class="install-banner-close" aria-label="Закрыть">✕</button>
+  el.innerHTML = `
+    <div class="install-banner-content">
+      <div class="install-banner-icon">📲</div>
+      <div class="install-banner-text">
+        <div class="install-banner-title">Установите приложение</div>
+        <div class="install-banner-desc">Быстрый доступ с главного экрана</div>
       </div>
-    `;
-  } else {
-    el.innerHTML = `
-      <div class="install-banner-content">
-        <div class="install-banner-icon">📲</div>
-        <div class="install-banner-text">
-          <div class="install-banner-title">Установите приложение</div>
-          <div class="install-banner-desc">Быстрый доступ с главного экрана</div>
-        </div>
-        <button class="install-banner-action btn btn-sm btn-primary">Установить</button>
-        <button class="install-banner-close" aria-label="Закрыть">✕</button>
-      </div>
-    `;
-  }
+      <button class="install-banner-action btn btn-sm btn-primary">Установить</button>
+      <button class="install-banner-close" aria-label="Закрыть">✕</button>
+    </div>
+  `;
 
   document.body.appendChild(el);
 

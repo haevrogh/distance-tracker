@@ -1,10 +1,12 @@
 /**
- * Apple-style Wheel Picker with Haptic Feedback
- * Mimics UIPickerView - scroll drums for selecting values
+ * Apple-style Wheel Picker with 3D Barrel Effect
+ * Uses CSS 3D transforms (rotateX + translateZ) to mimic iOS UIPickerView
  */
 
 const ITEM_HEIGHT = 44;
-const VISIBLE_ITEMS = 7;
+const ITEM_ANGLE = 20; // degrees per item on the cylinder
+const RADIUS = Math.round(ITEM_HEIGHT / (2 * Math.sin(ITEM_ANGLE / 2 * Math.PI / 180)));
+// ~127px for 44px items at 20° spacing
 
 function haptic(style = 'light') {
   if (!navigator.vibrate) return;
@@ -22,17 +24,13 @@ function createColumn(items, selectedIndex, onChange) {
   const list = document.createElement('div');
   list.className = 'wheel-list';
 
-  const padCount = Math.floor(VISIBLE_ITEMS / 2);
-  const allItems = [
-    ...Array(padCount).fill({ label: '', value: null }),
-    ...items,
-    ...Array(padCount).fill({ label: '', value: null }),
-  ];
-
-  allItems.forEach((item) => {
+  // Each item is positioned on the 3D cylinder
+  items.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = 'wheel-item';
     el.textContent = item.label;
+    // Position on cylinder: rotateX by item angle, push out by radius
+    el.style.transform = `rotateX(${-i * ITEM_ANGLE}deg) translateZ(${RADIUS}px)`;
     list.appendChild(el);
   });
 
@@ -54,24 +52,18 @@ function createColumn(items, selectedIndex, onChange) {
     } else {
       list.style.transition = 'none';
     }
-    list.style.transform = `translateY(${offset}px)`;
+    // Convert pixel offset to rotation angle
+    const angle = offset / ITEM_HEIGHT * ITEM_ANGLE;
+    list.style.transform = `translateZ(${-RADIUS}px) rotateX(${-angle}deg)`;
     updateHighlight();
   }
 
   function updateHighlight() {
-    const allEls = list.children;
     const centerPos = -offset / ITEM_HEIGHT;
+    const allEls = list.children;
     for (let i = 0; i < allEls.length; i++) {
-      const isPad = i < padCount || i >= allEls.length - padCount;
-      if (isPad) {
-        allEls[i].style.opacity = '0';
-      } else {
-        allEls[i].style.opacity = '';
-        allEls[i].style.transform = '';
-        const realIdx = i - padCount;
-        const dist = Math.abs(realIdx - centerPos);
-        allEls[i].style.fontWeight = dist < 0.5 ? '600' : '400';
-      }
+      const dist = Math.abs(i - centerPos);
+      allEls[i].style.fontWeight = dist < 0.5 ? '600' : '400';
     }
   }
 
@@ -147,7 +139,8 @@ function createColumn(items, selectedIndex, onChange) {
 
       list.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
       offset = snapped;
-      list.style.transform = `translateY(${offset}px)`;
+      const angle = offset / ITEM_HEIGHT * ITEM_ANGLE;
+      list.style.transform = `translateZ(${-RADIUS}px) rotateX(${-angle}deg)`;
       updateHighlight();
 
       const newIndex = Math.round(-snapped / ITEM_HEIGHT);
@@ -237,7 +230,7 @@ const PICKER_CONFIGS = {
 
 /**
  * Show a wheel picker
- * @param {string} type - 'weight' | 'waist' | 'hips' | 'goal'
+ * @param {string} type - 'weight' | 'waist' | 'hips' | 'goal' | 'distance'
  * @param {number} currentValue - Current value
  * @param {function} onConfirm - Callback with selected value
  */
